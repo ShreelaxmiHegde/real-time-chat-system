@@ -6,8 +6,13 @@ export default function ChatBoard() {
 
     function sendmsg(formData) {
         const msg = formData.get("msg");
+        const username = formData.get("username");
+
+        socket.auth = { username };
+        socket.connect();
+
         socket.emit('chat message', {
-            user: socket.id,
+            user: username,
             text: msg,
             time: new Date().toISOString()
         });
@@ -18,6 +23,16 @@ export default function ChatBoard() {
             setMessages((prev) => [...prev, msg]) //append new message
         });
 
+        socket.on('users', (users) => {
+            users.forEach((user) => {
+                user.self = user.userID === socket.id;
+            })
+        });
+
+        socket.on('user connected', (user) => {
+            console.log(user);
+        });
+
         return () => {
             socket.off("chat message"); //cleanup
         }
@@ -26,9 +41,18 @@ export default function ChatBoard() {
     return (
         <>
             <h1>Chat Board</h1>
+
             <form action={sendmsg}>
-                <input name="msg" />
-                <button type="submit">Send</button>
+                <div>
+                    <label htmlFor="username">Username: </label>
+                    <input type="text" name="username" id="username" />
+                </div>
+                <div>
+                    <label htmlFor="msg">Messsage: </label>
+                    <input name="msg" id='msg' />
+
+                    <button type="submit">Send</button>
+                </div>
             </form>
 
             <div>
@@ -39,6 +63,7 @@ export default function ChatBoard() {
                             <strong>{msg.user}</strong>
                             <p>{msg.text}</p>
                             <p>{msg.time}</p>
+                            <br />
                         </div>
                     ))}
                 </div>

@@ -19,10 +19,34 @@ app.use(cors({
     credentials: true
 }));
 
-io.on('connection', (socket) => {
-    console.log("User Connected: ", socket.id);
+io.use((socket, next) => {
+    const username = socket.handshake.auth.username;
 
-    socket.emit('Onboard', `Welcome to Chatboard ${socket.id}`)
+    if(!username) {
+        return next(new Error("invalid username"));
+    }
+
+    socket.username = username;
+    next();
+})
+
+io.on('connection', (socket) => {
+    console.log("User Connected: ", socket.handshake.auth.username);
+
+    const users = [];
+    for(let [id, socket] of io.of("/").sockets) {
+        users.push({
+            userID: id,
+            username: socket.username
+        });
+    }
+
+    socket.emit("users", users);
+
+    socket.broadcast.emit('user connected', {
+        userID: socket.id,
+        username: socket.username
+    })
 
     socket.on('chat message', (data) => {
         console.log("message: ", data);

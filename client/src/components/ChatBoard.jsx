@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 
 export default function ChatBoard() {
     const [messages, setMessages] = useState([]);
+    const [users, setUsers] = useState([]);
 
     function sendmsg(formData) {
         const msg = formData.get("msg");
@@ -18,23 +19,35 @@ export default function ChatBoard() {
         });
     }
 
+    const info = {
+        roomID: "group:222",
+        username: "demoUser"
+    }
+
+    function joinRoom() {
+        //TODO: client-side auth validation
+        socket.connect();
+        socket.emit('join_room', info);
+    }
+
     useEffect(() => {
         socket.on('chat message', (msg) => {
             setMessages((prev) => [...prev, msg]) //append new message
         });
 
-        socket.on('users', (users) => {
-            users.forEach((user) => {
-                user.self = user.userID === socket.id;
-            })
+        socket.on('user connected', (user) => {
+            console.log("Connected user: ", user);
+            setUsers((prev) => [...prev, user]);
         });
 
-        socket.on('user connected', (user) => {
-            console.log(user);
-        });
+        socket.on('new_join', (msg) => {
+            console.log("new user msg: ", msg)
+        })
 
         return () => {
             socket.off("chat message"); //cleanup
+            socket.off('users');
+            socket.off('user connected');
         }
     }, []);
 
@@ -55,6 +68,10 @@ export default function ChatBoard() {
                 </div>
             </form>
 
+            <form action={joinRoom}>
+                <button type='submit'>Join Room</button>
+            </form>
+
             <div>
                 <h2>Messages</h2>
                 <div>
@@ -64,9 +81,21 @@ export default function ChatBoard() {
                             <p>{msg.text}</p>
                             <p>{msg.time}</p>
                             <br />
+                            <hr />
                         </div>
                     ))}
                 </div>
+            </div>
+
+            <hr />
+            <div>
+                <h2>Users</h2>
+                {users.map((user) => (
+                    <>
+                    <h3 key={user.userID}>{user.username}</h3>
+                    <hr />
+                    </>
+                ))}
             </div>
         </>
     )

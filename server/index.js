@@ -14,34 +14,21 @@ const io = new Server(server, {
     }
 });
 
+app.use(express.json()); //enable req.body parsing
 app.use(cors({
     origin: "http://localhost:5173",
     credentials: true
 }));
 
-io.use((socket, next) => {
-    const username = socket.handshake.auth.username;
-
-    if(!username) {
-        return next(new Error("invalid username"));
-    }
-
-    socket.username = username;
-    next();
-})
-
 io.on('connection', (socket) => {
-    console.log("User Connected: ", socket.handshake.auth.username);
+    console.log("User Connected: ", socket.id);
 
-    const users = [];
-    for(let [id, socket] of io.of("/").sockets) {
-        users.push({
-            userID: id,
-            username: socket.username
-        });
-    }
-
-    socket.emit("users", users);
+    socket.on('join_room', (info) => {
+        console.log(info);
+        // TODO: auth validation
+        socket.join(info.roomID);
+        socket.to(info.roomID).emit("new_join", `${info.username} joined`)
+    })
 
     socket.broadcast.emit('user connected', {
         userID: socket.id,

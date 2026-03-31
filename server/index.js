@@ -4,6 +4,9 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 require('dotenv').config();
 
+const usersRoutes = require('./src/users/routes.js');
+const groupsRoutes = require('./src/groups/routes.js');
+
 const port = 8080;
 const app = express();
 const server = http.createServer(app);
@@ -19,6 +22,9 @@ app.use(cors({
     origin: "http://localhost:5173",
     credentials: true
 }));
+
+app.use("/users", usersRoutes);
+app.use("/groups", groupsRoutes);
 
 io.on('connection', (socket) => {
     console.log("User Connected: ", socket.id);

@@ -9,6 +9,4 @@ const pool = new Pool({
     database: process.env.POOL_DATABASE
 });
 
-console.log(process.env.POOL_HOST);
-
 module.exports = pool;

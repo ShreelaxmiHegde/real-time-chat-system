@@ -1,0 +1,41 @@
+const { Server } = require('socket.io');
+
+export const initSocket = (server) => {
+    const io = new Server(server, {
+        cors: {
+            origin: "http://localhost:5173",
+            methods: ["GET", "POST"]
+        }
+    });
+
+    io.on('connection', (socket) => {
+        registerGroupHandlers(io, socket);
+    });
+
+    return io;
+}
+
+// io.on('connection', (socket) => {
+//     console.log("User Connected: ", socket.id);
+
+//     socket.on('join_room', (info) => {
+//         console.log(info);
+//         // TODO: auth validation
+//         socket.join(info.roomID);
+//         socket.to(info.roomID).emit("new_join", `${info.username} joined`)
+//     })
+
+//     socket.broadcast.emit('user connected', {
+//         userID: socket.id,
+//         username: socket.username
+//     })
+
+//     socket.on('chat message', (data) => {
+//         console.log("message: ", data);
+//         io.emit('chat message', data);
+//     })
+
+//     socket.on('disconnect', () => {
+//         console.log("User Disconnected:", socket.id)
+//     })
+// });

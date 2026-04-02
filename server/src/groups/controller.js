@@ -38,8 +38,7 @@ const createGroup = (req, res) => {
 
 const joinGroup = (req, res) => {
     const { groupId, userId } = req.body;
-    console.log(groupId, userId)
-
+    
     pool.query(queries.joinGroup, [groupId, userId], (err, result) => {
         if(err) {
             console.log(err);

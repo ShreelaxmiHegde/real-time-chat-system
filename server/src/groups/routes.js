@@ -9,4 +9,7 @@ router.route('/')
 router.route('/:id')
 .delete(controller.deleteGroup)
 
+router.route('/:id/join')
+.post(controller.joinGroup);
+
 module.exports = router;

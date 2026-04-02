@@ -16,13 +16,14 @@ const showAllGroups = (req, res) => {
 }
 
 const createGroup = (req, res) => {
-    const { name, created_by, created_at } = req.body;
+    const { name, createdBy, createdAt } = req.body;
 
     pool.query(
         queries.createGroup,
-        [name, created_by, created_at],
+        [name, createdBy, createdAt],
         (err, result) => {
             if (err) {
+                console.log(err)
                 return res.json({
                     message: "Failed to create group"
                 });
@@ -33,6 +34,24 @@ const createGroup = (req, res) => {
             });
         }
     );
+}
+
+const joinGroup = (req, res) => {
+    const { groupId, userId } = req.body;
+    console.log(groupId, userId)
+
+    pool.query(queries.joinGroup, [groupId, userId], (err, result) => {
+        if(err) {
+            console.log(err);
+            return res.json({
+                message: "Failed to join group"
+            });
+        }
+
+        return res.status(201).json({
+            message: "Joined group successfully"
+        });
+    });
 }
 
 const deleteGroup = (req, res) => {
@@ -55,5 +74,6 @@ const deleteGroup = (req, res) => {
 module.exports = {
     showAllGroups,
     createGroup,
+    joinGroup,
     deleteGroup
 }

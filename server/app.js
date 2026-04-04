@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const usersRoutes = require('./src/users/routes.js');
 const groupsRoutes = require('./src/groups/routes.js');
+const messageRoutes = require('./src/messages/routes.js');
 
 app.use(express.json()); //enable req.body parsing
 app.use(cors({
@@ -14,5 +15,6 @@ app.use(cors({
 
 app.use("/users", usersRoutes);
 app.use("/groups", groupsRoutes);
+app.use("/groups/:groupId", messageRoutes);
 
 module.exports = app;

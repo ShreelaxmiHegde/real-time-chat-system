@@ -1,22 +1,64 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchMessages, sendMessage } from "../api/apis";
 
 export default function MessageBoard() {
-  const [messages] = useState([
+  const [messages, setMessages] = useState([
     { user: "Alice", text: "Hello!" },
     { user: "Bob", text: "Hey there!" },
   ]);
 
   const [input, setInput] = useState("");
+  
+  const sendMsg = async () => {
+    try {
+      let data = {
+        groupId: 10,
+        userId: 5,
+        content: input,
+        metadata: {
+          type: "text"
+        }
+      }
+  
+      let res = await sendMessage(data);
+      console.log(res);
+
+    } catch (err) {
+      console.log("Error while sending message: ", err);
+    }
+  }
 
   const handleSend = () => {
-    if (!input.trim()) return;
+    try {
+      if (!input.trim()) return;
+  
+      let message = {
+        user: "nora",
+        text: input
+      }
+  
+      sendMsg();
+      // TODO:
+      // - send message via API / socket
 
-    // TODO:
-    // - send message via API / socket
-    // - optimistic UI update
+      setMessages([...messages, message]);
+      setInput("");
 
-    setInput("");
+    } catch (err) {
+      console.log(err);
+    }
   };
+
+  useEffect(() => {
+    const fetch = async () => {
+      let groupId = 10;
+      let msgs = await fetchMessages(groupId);
+      console.log("messages fetched: ", msgs)
+      // setMessages(msgs);
+    }
+
+    fetch();
+  }, []);
 
   return (
     <div className="h-full flex flex-col">

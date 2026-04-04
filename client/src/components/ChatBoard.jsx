@@ -24,7 +24,7 @@ export default function ChatBoard() {
         username: "demoUser"
     }
 
-    function joinRoom() {
+    function joinGroup() {
         //TODO: client-side auth validation
         socket.connect();
         socket.emit('join_room', info);
@@ -68,8 +68,8 @@ export default function ChatBoard() {
                 </div>
             </form>
 
-            <form action={joinRoom}>
-                <button type='submit'>Join Room</button>
+            <form action={joinGroup}>
+                <button type='submit'>Join Group</button>
             </form>
 
             <div>

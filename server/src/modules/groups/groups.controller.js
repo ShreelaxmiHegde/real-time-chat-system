@@ -1,5 +1,5 @@
 const pool = require('../../db');
-const queries = require('./queries');
+const queries = require('./groups.repository');
 
 const showAllGroups = (req, res) => {
     pool.query(queries.showAllGroups, (err, result) => {

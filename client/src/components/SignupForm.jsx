@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { signup } from "../auth/auth.service.js";
+import { useAuth } from "../auth/useAuth.js";
 
 export default function SignupForm() {
   const [form, setForm] = useState({
@@ -7,12 +9,17 @@ export default function SignupForm() {
     password: "",
   });
 
-  const handleSubmit = (e) => {
+  const { login } = useAuth();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // TODO:
-    // - call signup API
-    // - auto-login after success OR redirect to login
+    try{
+      const data = await signup(form);
+      login(data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { loginUser } from "../auth/auth.service";
+import { useAuth } from "../auth/useAuth";
 
 export default function LoginForm() {
   const [form, setForm] = useState({
@@ -6,13 +8,17 @@ export default function LoginForm() {
     password: "",
   });
 
-  const handleSubmit = (e) => {
+  const { login } = useAuth();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // TODO:
-    // - call login API
-    // - store token (cookie/localStorage)
-    // - update auth state (Zustand)
+    try {
+      const data = await loginUser(form);
+      login(data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (

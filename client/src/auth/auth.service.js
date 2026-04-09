@@ -1,13 +1,21 @@
 import api from "../api/axios";
 
 export const signup = async (formData) => {
-    console.log(formData);
     let res = await api.post("/signup", formData);
-    return res.message;
+    return res.data;
 }
 
-export const login = async (formData) => {
+export const loginUser = async (formData) => {
     let res = await api.post("/login", formData);
-    console.log(res);
-    return res.message;
+    return res.data;
+}
+
+export const getUser = async (token) => {
+    let res = await api.get("/user", {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+
+    return res.data.user;
 }

@@ -1,8 +1,15 @@
 import { useState } from "react";
 import AuthModal from "./AuthModal";
+import { useAuth } from "../auth/useAuth";
 
 export default function AuthBar() {
   const [mode, setMode] = useState(null); // "login" | "signup" | null
+
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    logout();
+  }
 
   return (
     <>
@@ -10,29 +17,29 @@ export default function AuthBar() {
         <h1 className="text-lg font-semibold">Chat App</h1>
 
         <div className="flex gap-2">
-          <button
-            onClick={() => setMode("login")}
-            className="px-3 py-1 bg-blue-600 rounded hover:bg-blue-500"
-          >
-            Login
-          </button>
+          {!user && (
+            <div className="flex py-4">
+              <button
+                onClick={() => setMode("login")}
+                className="px-3 py-1 bg-blue-600 rounded hover:bg-blue-500"
+              >Login</button>
 
-          <button
-            onClick={() => setMode("signup")}
-            className="px-3 py-1 bg-green-600 rounded hover:bg-green-500"
-          >
-            Signup
-          </button>
+              <button
+                onClick={() => setMode("signup")}
+                className="px-3 py-1 bg-green-600 rounded hover:bg-green-500"
+              >Signup</button>
+            </div>
+          )}
 
-          <button className="px-3 py-1 bg-red-600 rounded hover:bg-red-500">
-            Logout
-          </button>
-
-          {/* TODO:
-            - hide login/signup if logged in
-            - show user info
-            - wire logout
-          */}
+          {user && (
+            <div className="flex flex-col">
+            <p>{user.username}</p>
+            <button
+              onClick={() => handleLogout()}
+              className="px-3 py-1 bg-red-600 rounded hover:bg-red-500"
+            >Logout</button>
+            </div>
+          )}
         </div>
       </div>
 

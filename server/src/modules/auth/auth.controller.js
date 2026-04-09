@@ -61,8 +61,47 @@ const signup = async (req, res) => {
     }
 }
 
-const login = (req, res) => {
+const login = async (req, res) => {
     const { email, password } = req.body;
+
+    const result = await pool.query(queries.login, [email]);
+    const user = result.rows[0];
+    if(!user) {
+        return res.status(401).json({ error: "User not found"});
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if(!isMatch) {
+        return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const token = createToken(user.id);
+
+    return res.json({
+        token,
+        user: {
+            id: user.id,
+            username: user.username,
+            email: user.email
+        }
+    });
 }
 
-module.exports = { signup, login };
+const getUser = async (req, res) => {
+    if(!req.user.id) {
+        return res.json({
+            message: "Request to get user failed"
+        })
+    }
+
+    const result = await pool.query(queries.getUser, [req.user.id]);
+    const user = result.rows[0];
+
+    return res.json({ user });
+}
+
+module.exports = { 
+    signup, 
+    login, 
+    getUser
+};

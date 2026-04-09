@@ -1,28 +1,36 @@
 import { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 import { setToken, getToken, clearToken } from "../utils/token";
+import { getUser } from "./auth.service";
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const getTokenFn = () => {
+        const initAuth = async () => {
             const token = getToken();
-    
-            if(token) {
-                // optional: fetch user from backend
-                setUser({ token });
+
+            if (!token) {
+                return setLoading(false)
+            }
+
+            try {
+                let userData = await getUser(token);
+                setUser(userData);
+            } catch (err) {
+                console.log(err);
+                clearToken();
+                setUser(null);
             }
 
             setLoading(false);
         }
 
-        getTokenFn();
+        initAuth();
     }, []);
 
     const login = (data) => {
-        console.log("auto login credentials: ", data.token, data.user)
         setToken(data.token);
         setUser(data.user);
     }
